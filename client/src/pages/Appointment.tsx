@@ -38,7 +38,7 @@ export default function Appointment() {
     e.preventDefault();
 
     if (!formData.patientName || !formData.patientEmail || !formData.patientPhone || !formData.preferredDate) {
-      toast.error("Please fill in all required fields");
+      toast.error(t("appointment.error") || "Please fill in all required fields");
       return;
     }
 
@@ -48,10 +48,10 @@ export default function Appointment() {
         patientEmail: formData.patientEmail,
         patientPhone: formData.patientPhone,
         serviceId: formData.serviceId ? parseInt(formData.serviceId) : undefined,
-        preferredDate: new Date(formData.preferredDate),
-        preferredTime: formData.preferredTime || undefined,
-        message: formData.message || undefined,
-        language: language,
+        appointmentDate: new Date(formData.preferredDate),
+        appointmentTime: formData.preferredTime || undefined,
+        messageEn: language === "en" ? formData.message : undefined,
+        messageHi: language === "hi" ? formData.message : undefined,
       });
 
       toast.success(t("appointment.success") || "Appointment booked successfully!");

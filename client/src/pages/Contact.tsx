@@ -1,7 +1,7 @@
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
-import MapView from "@/components/Map";
+import { MapView } from "@/components/Map";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -219,7 +219,7 @@ export default function Contact() {
           {/* Map Section */}
           <div className="bg-gray-100 rounded-lg overflow-hidden shadow-lg h-96">
             <MapView
-              onMapReady={(map) => {
+              onMapReady={(map: any) => {
                 if (map) {
                   const clinicLocation = {
                     lat: parseFloat(clinicInfo.latitude),

@@ -1,3 +1,4 @@
+// Contact Page - Ayurveda Clinic
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
@@ -11,6 +12,9 @@ import { MapPin, Phone, Mail, Clock } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
+/**
+ * Contact page with Google Maps integration and contact form
+ */
 export default function Contact() {
   const { t, language } = useLanguage();
   const [formData, setFormData] = useState({

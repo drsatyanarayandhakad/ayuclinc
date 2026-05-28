@@ -93,8 +93,14 @@ export default function Footer() {
         </div>
 
         {/* Divider */}
-        <div className="border-t border-gray-800 pt-8">
-          <p className="text-center text-gray-400 text-sm">{t("footer.copyright")}</p>
+        <div className="border-t border-gray-800 pt-8 flex flex-col sm:flex-row items-center justify-between gap-2">
+          <p className="text-gray-400 text-sm">{t("footer.copyright")}</p>
+          <Link
+            href="/admin/login"
+            className="text-gray-600 hover:text-green-400 text-xs transition flex items-center gap-1"
+          >
+            🔒 Admin Login
+          </Link>
         </div>
       </div>
     </footer>

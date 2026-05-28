@@ -48,10 +48,16 @@ export default function Navigation() {
           <div className="flex items-center gap-4">
             <LanguageSwitcher />
 
-            {user?.role === "admin" && (
+            {user?.role === "admin" ? (
               <Link href="/admin">
                 <Button variant="default" className="bg-green-600 hover:bg-green-700">
                   {t("nav.admin")}
+                </Button>
+              </Link>
+            ) : (
+              <Link href="/admin/login">
+                <Button variant="outline" size="sm" className="text-green-700 border-green-300 hover:bg-green-50 text-xs">
+                  Admin
                 </Button>
               </Link>
             )}

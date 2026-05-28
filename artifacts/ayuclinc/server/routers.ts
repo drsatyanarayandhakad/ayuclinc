@@ -79,6 +79,11 @@ export const appRouter = router({
           openingHoursHi: z.string().optional(),
           logoUrl: z.string().optional(),
           bannerImageUrl: z.string().optional(),
+          facebookUrl: z.string().optional(),
+          instagramUrl: z.string().optional(),
+          twitterUrl: z.string().optional(),
+          youtubeUrl: z.string().optional(),
+          whatsappNumber: z.string().optional(),
         })
       )
       .mutation(async ({ input }) => {

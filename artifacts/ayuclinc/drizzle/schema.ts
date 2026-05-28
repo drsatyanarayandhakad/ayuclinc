@@ -43,6 +43,11 @@ export const clinicInfo = pgTable("clinic_info", {
   openingHoursHi: text("opening_hours_hi"),
   logoUrl: varchar("logo_url", { length: 500 }),
   bannerImageUrl: varchar("banner_image_url", { length: 500 }),
+  facebookUrl: varchar("facebook_url", { length: 500 }),
+  instagramUrl: varchar("instagram_url", { length: 500 }),
+  twitterUrl: varchar("twitter_url", { length: 500 }),
+  youtubeUrl: varchar("youtube_url", { length: 500 }),
+  whatsappNumber: varchar("whatsapp_number", { length: 20 }),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 });

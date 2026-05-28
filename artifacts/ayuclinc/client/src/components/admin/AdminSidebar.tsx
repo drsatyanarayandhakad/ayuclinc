@@ -12,13 +12,14 @@ import {
   Images,
   Calendar,
   Users,
+  Share2,
   LogOut,
   Menu,
   X,
   Leaf,
 } from "lucide-react";
 
-type AdminSection = "dashboard" | "clinic" | "services" | "blog" | "testimonials" | "faqs" | "gallery" | "appointments" | "team";
+type AdminSection = "dashboard" | "clinic" | "services" | "blog" | "testimonials" | "faqs" | "gallery" | "appointments" | "team" | "social";
 
 interface AdminSidebarProps {
   activeSection: AdminSection;
@@ -47,6 +48,7 @@ export default function AdminSidebar({
     { id: "gallery" as AdminSection, label: t("admin.gallery"), icon: Images },
     { id: "appointments" as AdminSection, label: t("admin.appointments"), icon: Calendar },
     { id: "team" as AdminSection, label: t("admin.team"), icon: Users },
+    { id: "social" as AdminSection, label: "Social Media", icon: Share2 },
   ];
 
   const handleLogout = async () => {

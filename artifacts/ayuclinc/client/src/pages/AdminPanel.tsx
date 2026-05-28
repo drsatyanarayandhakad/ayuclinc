@@ -13,9 +13,10 @@ import AdminFAQs from "@/components/admin/AdminFAQs";
 import AdminGallery from "@/components/admin/AdminGallery";
 import AdminAppointments from "@/components/admin/AdminAppointments";
 import AdminTeam from "@/components/admin/AdminTeam";
+import AdminSocialMedia from "@/components/admin/AdminSocialMedia";
 import AdminSidebar from "@/components/admin/AdminSidebar";
 
-type AdminSection = "dashboard" | "clinic" | "services" | "blog" | "testimonials" | "faqs" | "gallery" | "appointments" | "team";
+type AdminSection = "dashboard" | "clinic" | "services" | "blog" | "testimonials" | "faqs" | "gallery" | "appointments" | "team" | "social";
 
 export default function AdminPanel() {
   const { user, loading, logout } = useAuth();
@@ -95,6 +96,7 @@ export default function AdminPanel() {
             {activeSection === "gallery" && <AdminGallery />}
             {activeSection === "appointments" && <AdminAppointments />}
             {activeSection === "team" && <AdminTeam />}
+            {activeSection === "social" && <AdminSocialMedia />}
           </div>
         </div>
       </div>

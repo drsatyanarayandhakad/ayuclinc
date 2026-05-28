@@ -1,0 +1,22 @@
+kind = "web"
+previewPath = "/"
+title = "AyuClinic"
+version = "1.0.0"
+id = "artifacts/ayuclinc"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 23915
+
+[services.development]
+run = "pnpm --filter @workspace/ayuclinc run dev"
+
+[services.env]
+PORT = "23915"
+NODE_ENV = "development"

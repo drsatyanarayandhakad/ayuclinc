@@ -23,10 +23,10 @@ export default function AdminPanel() {
   const [activeSection, setActiveSection] = useState<AdminSection>("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
-  // Redirect to home if not admin
+  // Redirect to admin login if not authenticated as admin
   useEffect(() => {
     if (!loading && (!user || user.role !== "admin")) {
-      setLocation("/");
+      setLocation("/admin/login");
     }
   }, [user, loading, setLocation]);
 

@@ -1,0 +1,1 @@
+- [AyuClinic auth approach](ayuclinc-auth.md) — Manus OAuth replaced with simple password auth; admin login at /auth/admin/login (not /api/* — that routes to api-server artifact)

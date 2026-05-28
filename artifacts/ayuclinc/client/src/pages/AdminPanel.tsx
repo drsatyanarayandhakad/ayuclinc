@@ -1,8 +1,9 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
 import { useEffect, useState } from "react";
-import { Loader2 } from "lucide-react";
+import { Loader2, LogOut, ExternalLink } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import AdminDashboard from "@/components/admin/AdminDashboard";
 import AdminClinicInfo from "@/components/admin/AdminClinicInfo";
 import AdminServices from "@/components/admin/AdminServices";
@@ -17,7 +18,7 @@ import AdminSidebar from "@/components/admin/AdminSidebar";
 type AdminSection = "dashboard" | "clinic" | "services" | "blog" | "testimonials" | "faqs" | "gallery" | "appointments" | "team";
 
 export default function AdminPanel() {
-  const { user, loading } = useAuth();
+  const { user, loading, logout } = useAuth();
   const { t } = useLanguage();
   const [, setLocation] = useLocation();
   const [activeSection, setActiveSection] = useState<AdminSection>("dashboard");
@@ -57,8 +58,28 @@ export default function AdminPanel() {
         {/* Header */}
         <div className="bg-white shadow-sm border-b border-gray-200 px-6 py-4 flex items-center justify-between">
           <h1 className="text-2xl font-bold text-gray-800">{t("admin.title")}</h1>
-          <div className="text-sm text-gray-600">
-            Welcome, <span className="font-semibold">{user.name || "Admin"}</span>
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-gray-600 hidden sm:inline">
+              Welcome, <span className="font-semibold">{user.name || "Admin"}</span>
+            </span>
+            <Link href="/">
+              <Button variant="outline" size="sm" className="gap-2 text-gray-600 hover:text-green-700">
+                <ExternalLink className="w-4 h-4" />
+                <span className="hidden sm:inline">View Site</span>
+              </Button>
+            </Link>
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-2 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+              onClick={async () => {
+                await logout();
+                window.location.href = "/admin/login";
+              }}
+            >
+              <LogOut className="w-4 h-4" />
+              <span className="hidden sm:inline">Logout</span>
+            </Button>
           </div>
         </div>
 

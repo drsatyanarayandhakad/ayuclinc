@@ -385,6 +385,167 @@ export const appRouter = router({
       return { success: true };
     }),
   }),
+
+  // ============== ADMIN PANEL ==============
+  admin: router({
+    blog: router({
+      list: adminProcedure.query(async () => {
+        return getBlogPosts();
+      }),
+      create: adminProcedure
+        .input(
+          z.object({
+            titleEn: z.string(),
+            titleHi: z.string(),
+            slugEn: z.string(),
+            slugHi: z.string(),
+            contentEn: z.string(),
+            contentHi: z.string(),
+            excerptEn: z.string().optional(),
+            excerptHi: z.string().optional(),
+          })
+        )
+        .mutation(async ({ input }) => {
+          return createBlogPost(input as any);
+        }),
+      update: adminProcedure
+        .input(
+          z.object({
+            id: z.number(),
+            titleEn: z.string().optional(),
+            titleHi: z.string().optional(),
+            slugEn: z.string().optional(),
+            slugHi: z.string().optional(),
+            contentEn: z.string().optional(),
+            contentHi: z.string().optional(),
+            excerptEn: z.string().optional(),
+            excerptHi: z.string().optional(),
+          })
+        )
+        .mutation(async ({ input }) => {
+          const { id, ...data } = input;
+          return updateBlogPost(id, data as any);
+        }),
+      delete: adminProcedure.input(z.object({ id: z.number() })).mutation(async ({ input }) => {
+        await deleteBlogPost(input.id);
+        return { success: true };
+      }),
+    }),
+    testimonials: router({
+      list: adminProcedure.query(async () => {
+        return getTestimonials();
+      }),
+      create: adminProcedure
+        .input(
+          z.object({
+            patientNameEn: z.string(),
+            patientNameHi: z.string().optional(),
+            testimonialEn: z.string(),
+            testimonialHi: z.string().optional(),
+            rating: z.number().min(1).max(5).optional(),
+          })
+        )
+        .mutation(async ({ input }) => {
+          return createTestimonial(input as any);
+        }),
+      update: adminProcedure
+        .input(
+          z.object({
+            id: z.number(),
+            patientNameEn: z.string().optional(),
+            patientNameHi: z.string().optional(),
+            testimonialEn: z.string().optional(),
+            testimonialHi: z.string().optional(),
+            rating: z.number().min(1).max(5).optional(),
+          })
+        )
+        .mutation(async ({ input }) => {
+          const { id, ...data } = input;
+          return updateTestimonial(id, data as any);
+        }),
+      delete: adminProcedure.input(z.object({ id: z.number() })).mutation(async ({ input }) => {
+        await deleteTestimonial(input.id);
+        return { success: true };
+      }),
+    }),
+    faqs: router({
+      list: adminProcedure.query(async () => {
+        return getFAQs();
+      }),
+      create: adminProcedure
+        .input(
+          z.object({
+            questionEn: z.string(),
+            questionHi: z.string().optional(),
+            answerEn: z.string(),
+            answerHi: z.string().optional(),
+            order: z.number().optional(),
+          })
+        )
+        .mutation(async ({ input }) => {
+          return createFAQ(input as any);
+        }),
+      update: adminProcedure
+        .input(
+          z.object({
+            id: z.number(),
+            questionEn: z.string().optional(),
+            questionHi: z.string().optional(),
+            answerEn: z.string().optional(),
+            answerHi: z.string().optional(),
+            order: z.number().optional(),
+          })
+        )
+        .mutation(async ({ input }) => {
+          const { id, ...data } = input;
+          return updateFAQ(id, data as any);
+        }),
+      delete: adminProcedure.input(z.object({ id: z.number() })).mutation(async ({ input }) => {
+        await deleteFAQ(input.id);
+        return { success: true };
+      }),
+    }),
+    gallery: router({
+      list: adminProcedure.query(async () => {
+        return getGalleryImages();
+      }),
+      create: adminProcedure
+        .input(
+          z.object({
+            titleEn: z.string(),
+            titleHi: z.string().optional(),
+            imageUrl: z.string(),
+            order: z.number().optional(),
+          })
+        )
+        .mutation(async ({ input }) => {
+          return createGalleryImage(input as any);
+        }),
+      update: adminProcedure
+        .input(
+          z.object({
+            id: z.number(),
+            titleEn: z.string().optional(),
+            titleHi: z.string().optional(),
+            imageUrl: z.string().optional(),
+            order: z.number().optional(),
+          })
+        )
+        .mutation(async ({ input }) => {
+          const { id, ...data } = input;
+          return updateGalleryImage(id, data as any);
+        }),
+      delete: adminProcedure.input(z.object({ id: z.number() })).mutation(async ({ input }) => {
+        await deleteGalleryImage(input.id);
+        return { success: true };
+      }),
+    }),
+    appointments: router({
+      list: adminProcedure.query(async () => {
+        return getAppointments();
+      }),
+    }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

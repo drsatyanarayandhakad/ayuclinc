@@ -2,6 +2,7 @@ import { trpc } from "@/lib/trpc";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Loader2, Save, Facebook, Instagram, Youtube, MessageCircle, Twitter } from "lucide-react";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
@@ -16,6 +17,7 @@ export default function AdminSocialMedia() {
     twitterUrl: "",
     youtubeUrl: "",
     whatsappNumber: "",
+    whatsappMessage: "",
   });
 
   useEffect(() => {
@@ -26,11 +28,12 @@ export default function AdminSocialMedia() {
         twitterUrl: info.twitterUrl || "",
         youtubeUrl: info.youtubeUrl || "",
         whatsappNumber: info.whatsappNumber || "",
+        whatsappMessage: info.whatsappMessage || "",
       });
     }
   }, [info]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
@@ -118,6 +121,41 @@ export default function AdminSocialMedia() {
               </div>
             </div>
           ))}
+
+          {/* WhatsApp Auto-Reply Message */}
+          <div className="mt-2 p-4 bg-green-50 border border-green-200 rounded-lg">
+            <div className="flex items-start gap-3 mb-3">
+              <div className="w-10 h-10 rounded-lg bg-white border flex items-center justify-center shrink-0 text-green-600">
+                <MessageCircle className="w-5 h-5" />
+              </div>
+              <div className="flex-1">
+                <label className="block text-sm font-semibold text-gray-800 mb-1">
+                  WhatsApp Auto-Reply Message
+                </label>
+                <p className="text-xs text-gray-500 mb-2">
+                  This message will be pre-filled automatically when a visitor clicks the WhatsApp button on your website.
+                </p>
+                <Textarea
+                  name="whatsappMessage"
+                  value={formData.whatsappMessage}
+                  onChange={handleChange}
+                  placeholder="Hello, I would like to book an appointment at AyuClinic."
+                  rows={3}
+                  className="text-sm"
+                />
+                {formData.whatsappMessage && formData.whatsappNumber && (
+                  <a
+                    href={`https://wa.me/${formData.whatsappNumber}?text=${encodeURIComponent(formData.whatsappMessage)}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1 mt-2 text-xs text-green-600 hover:underline"
+                  >
+                    <MessageCircle className="w-3 h-3" /> Preview WhatsApp link
+                  </a>
+                )}
+              </div>
+            </div>
+          </div>
 
           <div className="pt-2">
             <Button

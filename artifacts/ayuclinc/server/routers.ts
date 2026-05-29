@@ -43,6 +43,7 @@ import {
   markContactMessageRead,
   deleteContactMessage,
 } from "./db";
+import { sendAppointmentEmail } from "./email";
 
 // Admin-only procedure
 const adminProcedure = protectedProcedure.use(async ({ ctx, next }) => {
@@ -91,6 +92,7 @@ export const appRouter = router({
           twitterUrl: z.string().optional(),
           youtubeUrl: z.string().optional(),
           whatsappNumber: z.string().optional(),
+          whatsappMessage: z.string().optional(),
         })
       )
       .mutation(async ({ input }) => {
@@ -337,7 +339,16 @@ export const appRouter = router({
         })
       )
       .mutation(async ({ input }) => {
-        return createAppointment({ ...input, status: "pending" });
+        const appt = await createAppointment({ ...input, status: "pending" });
+        sendAppointmentEmail({
+          patientName: input.patientName,
+          patientEmail: input.patientEmail,
+          patientPhone: input.patientPhone,
+          appointmentDate: input.appointmentDate,
+          appointmentTime: input.appointmentTime,
+          messageEn: input.messageEn,
+        }).catch((err) => console.error("[email] send error:", err));
+        return appt;
       }),
     updateStatus: adminProcedure
       .input(

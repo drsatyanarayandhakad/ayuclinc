@@ -1,5 +1,6 @@
 import { MessageCircle } from "lucide-react";
 import { useEffect, useState } from "react";
+import { trpc } from "@/lib/trpc";
 
 interface WhatsAppButtonProps {
   phoneNumber?: string;
@@ -7,19 +8,30 @@ interface WhatsAppButtonProps {
 }
 
 export default function WhatsAppButton({
-  phoneNumber = "919876543210", // Default number - should be replaced with clinic's number
-  message = "Hello, I would like to book an appointment.",
+  phoneNumber: propPhone,
+  message: propMessage,
 }: WhatsAppButtonProps) {
   const [isVisible, setIsVisible] = useState(false);
+  const { data: clinicInfo } = trpc.clinic.getInfo.useQuery();
 
   useEffect(() => {
-    // Show button after component mounts to avoid hydration issues
     setIsVisible(true);
   }, []);
 
   if (!isVisible) return null;
 
+  const phoneNumber = clinicInfo?.whatsappNumber || propPhone || "919876543210";
+  const message =
+    clinicInfo?.whatsappMessage ||
+    propMessage ||
+    "Hello, I would like to book an appointment.";
+
   const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+
+  const isDefaultNumber = phoneNumber === "919876543210" && !clinicInfo?.whatsappNumber;
+  if (!phoneNumber || isDefaultNumber) {
+    return null;
+  }
 
   return (
     <a

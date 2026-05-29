@@ -74,6 +74,11 @@ async function startServer() {
     res.json({ success: true });
   });
   
+  // Health check — used by anti-sleep self-ping
+  app.get("/healthz", (_req, res) => {
+    res.json({ ok: true, ts: Date.now() });
+  });
+
   // Sitemap route
   app.get("/sitemap.xml", (req, res) => {
     const baseUrl = `${req.protocol}://${req.get("host")}`;
@@ -110,3 +115,16 @@ async function startServer() {
 }
 
 startServer().catch(console.error);
+
+// Anti-sleep self-ping — keeps the server awake even with no visitors
+// Pings every 4 minutes so Replit deployment never goes idle
+setTimeout(() => {
+  const PING_INTERVAL_MS = 4 * 60 * 1000;
+  const selfPing = () => {
+    const port = parseInt(process.env.PORT || "3000");
+    const url = `http://localhost:${port}/healthz`;
+    fetch(url).catch(() => {});
+  };
+  setInterval(selfPing, PING_INTERVAL_MS);
+  console.log("[anti-sleep] Self-ping enabled every 4 minutes");
+}, 10000);

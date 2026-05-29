@@ -48,6 +48,7 @@ export const clinicInfo = pgTable("clinic_info", {
   twitterUrl: varchar("twitter_url", { length: 500 }),
   youtubeUrl: varchar("youtube_url", { length: 500 }),
   whatsappNumber: varchar("whatsapp_number", { length: 20 }),
+  whatsappMessage: text("whatsapp_message"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 });

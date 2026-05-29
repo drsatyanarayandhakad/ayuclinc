@@ -12,6 +12,8 @@ import {
   galleryImages,
   appointments,
   teamMembers,
+  newsletterSubscribers,
+  contactMessages,
   type ClinicInfo,
   type Service,
   type BlogPost,
@@ -20,6 +22,8 @@ import {
   type GalleryImage,
   type Appointment,
   type TeamMember,
+  type NewsletterSubscriber,
+  type ContactMessage,
 } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 
@@ -427,4 +431,59 @@ export async function deleteTeamMember(id: number): Promise<void> {
   if (!db) throw new Error("Database not available");
 
   await db.update(teamMembers).set({ isActive: false }).where(eq(teamMembers.id, id));
+}
+
+// ============== NEWSLETTER ==============
+export async function subscribeNewsletter(email: string, language = "en"): Promise<NewsletterSubscriber> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const existing = await db.select().from(newsletterSubscribers).where(eq(newsletterSubscribers.email, email)).limit(1);
+  if (existing[0]) {
+    await db.update(newsletterSubscribers).set({ isActive: true }).where(eq(newsletterSubscribers.email, email));
+    return existing[0] as NewsletterSubscriber;
+  }
+  await db.insert(newsletterSubscribers).values({ email, language, isActive: true });
+  const result = await db.select().from(newsletterSubscribers).where(eq(newsletterSubscribers.email, email)).limit(1);
+  return result[0] as NewsletterSubscriber;
+}
+
+export async function getNewsletterSubscribers(): Promise<NewsletterSubscriber[]> {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(newsletterSubscribers).where(eq(newsletterSubscribers.isActive, true)).orderBy(desc(newsletterSubscribers.subscribedAt));
+}
+
+export async function deleteNewsletterSubscriber(id: number): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(newsletterSubscribers).set({ isActive: false }).where(eq(newsletterSubscribers.id, id));
+}
+
+// ============== CONTACT MESSAGES ==============
+export async function createContactMessage(data: { name: string; email: string; phone?: string; subject?: string; message: string }): Promise<ContactMessage> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.insert(contactMessages).values(data as any);
+  const result = await db.select().from(contactMessages).orderBy(desc(contactMessages.id)).limit(1);
+  return result[0] as ContactMessage;
+}
+
+export async function getContactMessages(): Promise<ContactMessage[]> {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(contactMessages).orderBy(desc(contactMessages.createdAt));
+}
+
+export async function markContactMessageRead(id: number): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(contactMessages).set({ isRead: true }).where(eq(contactMessages.id, id));
+}
+
+export async function deleteContactMessage(id: number): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(contactMessages).where(eq(contactMessages.id, id));
 }

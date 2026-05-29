@@ -15,6 +15,7 @@ import Appointment from "./pages/Appointment";
 import Contact from "./pages/Contact";
 import AdminPanel from "./pages/AdminPanel";
 import AdminLogin from "./pages/AdminLogin";
+import FAQPage from "./pages/FAQPage";
 
 function Router() {
   return (
@@ -27,6 +28,7 @@ function Router() {
       <Route path={"/blog/:slug"} component={BlogDetail} />
       <Route path={"/appointment"} component={Appointment} />
       <Route path={"/contact"} component={Contact} />
+      <Route path={"/faq"} component={FAQPage} />
       <Route path={"/admin/login"} component={AdminLogin} />
       <Route path={"/admin"} component={AdminPanel} />
       <Route path={"/404"} component={NotFound} />

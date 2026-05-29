@@ -5,13 +5,17 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Calendar, User, ArrowRight } from "lucide-react";
+import { Calendar, User, ArrowRight, Loader2 } from "lucide-react";
 import { useLocation } from "wouter";
+import { useState } from "react";
+import { toast } from "sonner";
 
 export default function Blog() {
   const { t, language } = useLanguage();
   const [, navigate] = useLocation();
   const { data: blogPosts, isLoading } = trpc.blog.list.useQuery();
+  const [subscribeEmail, setSubscribeEmail] = useState("");
+  const subscribeMutation = trpc.newsletter.subscribe.useMutation();
 
   const formatDate = (date: Date) => {
     return new Date(date).toLocaleDateString(language === "en" ? "en-US" : "hi-IN", {
@@ -113,11 +117,29 @@ export default function Blog() {
           <div className="flex gap-2 max-w-md mx-auto">
             <input
               type="email"
+              value={subscribeEmail}
+              onChange={(e) => setSubscribeEmail(e.target.value)}
               placeholder={language === "en" ? "Your email..." : "आपका ईमेल..."}
               className="flex-1 px-4 py-3 rounded-lg text-gray-900"
             />
-            <Button className="bg-white text-green-600 hover:bg-gray-100">
-              {language === "en" ? "Subscribe" : "सब्सक्राइब करें"}
+            <Button
+              className="bg-white text-green-600 hover:bg-gray-100"
+              disabled={subscribeMutation.isPending}
+              onClick={async () => {
+                if (!subscribeEmail || !subscribeEmail.includes("@")) {
+                  toast.error(language === "en" ? "Enter a valid email" : "सही ईमेल दर्ज करें");
+                  return;
+                }
+                try {
+                  await subscribeMutation.mutateAsync({ email: subscribeEmail, language });
+                  toast.success(language === "en" ? "Subscribed successfully!" : "सब्सक्राइब हो गए!");
+                  setSubscribeEmail("");
+                } catch {
+                  toast.error(language === "en" ? "Already subscribed or error occurred" : "पहले से सब्सक्राइब है या त्रुटि हुई");
+                }
+              }}
+            >
+              {subscribeMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : (language === "en" ? "Subscribe" : "सब्सक्राइब करें")}
             </Button>
           </div>
         </div>

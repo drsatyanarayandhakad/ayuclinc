@@ -8,9 +8,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
-import { MapPin, Phone, Mail, Clock } from "lucide-react";
+import { MapPin, Phone, Mail, Clock, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { trpc } from "@/lib/trpc";
 
 /**
  * Contact page with Google Maps integration and contact form
@@ -33,14 +34,21 @@ export default function Contact() {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const sendMutation = trpc.contact.send.useMutation();
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name || !formData.email || !formData.message) {
       toast.error("Please fill in all required fields");
       return;
     }
-    toast.success("Message sent successfully! We will contact you soon.");
-    setFormData({ name: "", email: "", phone: "", subject: "", message: "" });
+    try {
+      await sendMutation.mutateAsync(formData);
+      toast.success(language === "en" ? "Message sent! We will contact you soon." : "संदेश भेजा गया! हम जल्द संपर्क करेंगे।");
+      setFormData({ name: "", email: "", phone: "", subject: "", message: "" });
+    } catch {
+      toast.error("Failed to send message. Please try again.");
+    }
   };
 
   const clinicInfo = {
@@ -212,9 +220,11 @@ export default function Contact() {
                 </div>
                 <Button
                   type="submit"
-                  className="w-full bg-green-600 hover:bg-green-700 text-white py-2 font-semibold"
+                  disabled={sendMutation.isPending}
+                  className="w-full bg-green-600 hover:bg-green-700 text-white py-2 font-semibold flex items-center justify-center gap-2"
                 >
-                  {t("contact.submit") || "Send Message"}
+                  {sendMutation.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
+                  {sendMutation.isPending ? "Sending..." : (t("contact.submit") || "Send Message")}
                 </Button>
               </form>
             </Card>

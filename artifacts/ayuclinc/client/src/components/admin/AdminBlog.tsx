@@ -2,7 +2,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus, Edit2, Trash2, X } from "lucide-react";
+import { Plus, Edit2, Trash2, Eye, EyeOff, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { trpc } from "@/lib/trpc";
@@ -12,6 +12,8 @@ export default function AdminBlog() {
   const { t } = useLanguage();
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
+  const publishMutation = trpc.admin.blog.update.useMutation();
+
   const [formData, setFormData] = useState({
     titleEn: "",
     titleHi: "",
@@ -21,6 +23,9 @@ export default function AdminBlog() {
     contentHi: "",
     excerptEn: "",
     excerptHi: "",
+    featuredImageUrl: "",
+    authorName: "",
+    isPublished: true,
   });
 
   const { data: blogPosts, refetch } = trpc.admin.blog.list.useQuery();

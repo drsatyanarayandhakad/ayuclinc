@@ -35,6 +35,13 @@ import {
   createTeamMember,
   updateTeamMember,
   deleteTeamMember,
+  subscribeNewsletter,
+  getNewsletterSubscribers,
+  deleteNewsletterSubscriber,
+  createContactMessage,
+  getContactMessages,
+  markContactMessageRead,
+  deleteContactMessage,
 } from "./db";
 
 // Admin-only procedure
@@ -408,10 +415,13 @@ export const appRouter = router({
             contentHi: z.string(),
             excerptEn: z.string().optional(),
             excerptHi: z.string().optional(),
+            featuredImageUrl: z.string().optional(),
+            authorName: z.string().optional(),
+            isPublished: z.boolean().optional(),
           })
         )
         .mutation(async ({ input }) => {
-          return createBlogPost(input as any);
+          return createBlogPost({ ...input, isPublished: input.isPublished ?? true, publishedAt: new Date() } as any);
         }),
       update: adminProcedure
         .input(
@@ -550,6 +560,56 @@ export const appRouter = router({
         return getAppointments();
       }),
     }),
+  }),
+
+  // ============== NEWSLETTER ==============
+  newsletter: router({
+    subscribe: publicProcedure
+      .input(z.object({ email: z.string().email(), language: z.string().optional() }))
+      .mutation(async ({ input }) => {
+        return subscribeNewsletter(input.email, input.language ?? "en");
+      }),
+    list: adminProcedure.query(async () => {
+      return getNewsletterSubscribers();
+    }),
+    delete: adminProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        await deleteNewsletterSubscriber(input.id);
+        return { success: true };
+      }),
+  }),
+
+  // ============== CONTACT MESSAGES ==============
+  contact: router({
+    send: publicProcedure
+      .input(
+        z.object({
+          name: z.string(),
+          email: z.string().email(),
+          phone: z.string().optional(),
+          subject: z.string().optional(),
+          message: z.string(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        return createContactMessage(input);
+      }),
+    list: adminProcedure.query(async () => {
+      return getContactMessages();
+    }),
+    markRead: adminProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        await markContactMessageRead(input.id);
+        return { success: true };
+      }),
+    delete: adminProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        await deleteContactMessage(input.id);
+        return { success: true };
+      }),
   }),
 });
 

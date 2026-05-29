@@ -62,6 +62,9 @@ export default function AdminBlog() {
         contentHi: "",
         excerptEn: "",
         excerptHi: "",
+        featuredImageUrl: "",
+        authorName: "",
+        isPublished: true,
       });
       setEditingId(null);
       setShowForm(false);
@@ -81,9 +84,22 @@ export default function AdminBlog() {
       contentHi: post.contentHi,
       excerptEn: post.excerptEn || "",
       excerptHi: post.excerptHi || "",
+      featuredImageUrl: post.featuredImageUrl || "",
+      authorName: post.authorName || "",
+      isPublished: post.isPublished ?? true,
     });
     setEditingId(post.id);
     setShowForm(true);
+  };
+
+  const handleTogglePublish = async (post: any) => {
+    try {
+      await publishMutation.mutateAsync({ id: post.id, isPublished: !post.isPublished });
+      toast.success(post.isPublished ? "Blog hidden from site" : "Blog published on site!");
+      refetch();
+    } catch {
+      toast.error("Failed to update publish status");
+    }
   };
 
   const handleDelete = async (id: number) => {
@@ -115,6 +131,9 @@ export default function AdminBlog() {
               contentHi: "",
               excerptEn: "",
               excerptHi: "",
+              featuredImageUrl: "",
+              authorName: "",
+              isPublished: true,
             });
           }}
           className="bg-green-600 hover:bg-green-700 flex items-center gap-2"
@@ -223,16 +242,45 @@ export default function AdminBlog() {
               </div>
             </div>
 
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Author Name</label>
+                <Input
+                  value={formData.authorName}
+                  onChange={(e) => setFormData({ ...formData, authorName: e.target.value })}
+                  placeholder="Dr. Sharma"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Featured Image URL</label>
+                <Input
+                  type="url"
+                  value={formData.featuredImageUrl}
+                  onChange={(e) => setFormData({ ...formData, featuredImageUrl: e.target.value })}
+                  placeholder="https://example.com/image.jpg"
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={formData.isPublished}
+                  onChange={(e) => setFormData({ ...formData, isPublished: e.target.checked })}
+                  className="w-4 h-4 accent-green-600"
+                />
+                <span className="text-sm font-medium text-gray-700">Publish immediately (visible on site)</span>
+              </label>
+            </div>
+
             <div className="flex gap-2">
-              <Button type="submit" className="bg-green-600 hover:bg-green-700">
-                {editingId ? "Update Post" : "Create Post"}
+              <Button type="submit" className="bg-green-600 hover:bg-green-700" disabled={createMutation.isPending || updateMutation.isPending}>
+                {createMutation.isPending || updateMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : editingId ? "Update Post" : "Create Post"}
               </Button>
               <Button
                 type="button"
-                onClick={() => {
-                  setShowForm(false);
-                  setEditingId(null);
-                }}
+                onClick={() => { setShowForm(false); setEditingId(null); }}
                 variant="outline"
               >
                 Cancel
@@ -245,14 +293,30 @@ export default function AdminBlog() {
       <div className="grid gap-4">
         {blogPosts && blogPosts.length > 0 ? (
           blogPosts.map((post) => (
-            <Card key={post.id} className="p-4">
-              <div className="flex items-start justify-between">
+            <Card key={post.id} className={`p-4 ${!post.isPublished ? "border-yellow-200 bg-yellow-50/30" : ""}`}>
+              <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">
-                  <h3 className="font-semibold text-gray-800">{post.titleEn}</h3>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h3 className="font-semibold text-gray-800">{post.titleEn}</h3>
+                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${post.isPublished ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"}`}>
+                      {post.isPublished ? "Published" : "Draft"}
+                    </span>
+                  </div>
                   <p className="text-sm text-gray-600">{post.titleHi}</p>
-                  <p className="text-xs text-gray-500 mt-2">{post.excerptEn}</p>
+                  <p className="text-xs text-gray-500 mt-1">{post.excerptEn}</p>
+                  {post.authorName && <p className="text-xs text-gray-400 mt-1">by {post.authorName}</p>}
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-2 shrink-0">
+                  <Button
+                    onClick={() => handleTogglePublish(post)}
+                    size="sm"
+                    variant="outline"
+                    disabled={publishMutation.isPending}
+                    title={post.isPublished ? "Hide from site" : "Publish on site"}
+                    className={post.isPublished ? "text-yellow-600 border-yellow-200" : "text-green-600 border-green-200"}
+                  >
+                    {post.isPublished ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </Button>
                   <Button
                     onClick={() => handleEdit(post)}
                     size="sm"

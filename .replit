@@ -39,3 +39,7 @@ externalPort = 3002
 
 [userenv.shared]
 ADMIN_PASSWORD = "AyuSatyam@2024"
+SMTP_HOST = "smtp.gmail.com"
+SMTP_PORT = "587"
+SMTP_USER = "satyambam567@gmail.com"
+ADMIN_EMAIL = "satyambam567@gmail.com"

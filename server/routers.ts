@@ -544,6 +544,57 @@ export const appRouter = router({
       list: adminProcedure.query(async () => {
         return getAppointments();
       }),
+      updateStatus: adminProcedure
+        .input(
+          z.object({
+            id: z.number(),
+            status: z.enum(["pending", "confirmed", "cancelled", "completed"]),
+          })
+        )
+        .mutation(async ({ input }) => {
+          return updateAppointment(input.id, { status: input.status } as any);
+        }),
+    }),
+    team: router({
+      list: adminProcedure.query(async () => {
+        return getTeamMembers();
+      }),
+      create: adminProcedure
+        .input(
+          z.object({
+            nameEn: z.string(),
+            nameHi: z.string().optional(),
+            titleEn: z.string().optional(),
+            titleHi: z.string().optional(),
+            bioEn: z.string().optional(),
+            bioHi: z.string().optional(),
+            imageUrl: z.string().optional(),
+          })
+        )
+        .mutation(async ({ input }) => {
+          return createTeamMember(input as any);
+        }),
+      update: adminProcedure
+        .input(
+          z.object({
+            id: z.number(),
+            nameEn: z.string().optional(),
+            nameHi: z.string().optional(),
+            titleEn: z.string().optional(),
+            titleHi: z.string().optional(),
+            bioEn: z.string().optional(),
+            bioHi: z.string().optional(),
+            imageUrl: z.string().optional(),
+          })
+        )
+        .mutation(async ({ input }) => {
+          const { id, ...data } = input;
+          return updateTeamMember(id, data as any);
+        }),
+      delete: adminProcedure.input(z.object({ id: z.number() })).mutation(async ({ input }) => {
+        await deleteTeamMember(input.id);
+        return { success: true };
+      }),
     }),
   }),
 });

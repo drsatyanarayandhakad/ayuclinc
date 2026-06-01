@@ -11,7 +11,7 @@ import AdminTestimonials from "@/components/admin/AdminTestimonials";
 import AdminFAQs from "@/components/admin/AdminFAQs";
 import AdminGallery from "@/components/admin/AdminGallery";
 import AdminAppointments from "@/components/admin/AdminAppointments";
-import AdminTeam from "@/components/admin/AdminTeam";
+import AdminTeamMembers from "@/components/admin/AdminTeamMembers";
 import AdminSidebar from "@/components/admin/AdminSidebar";
 
 type AdminSection = "dashboard" | "clinic" | "services" | "blog" | "testimonials" | "faqs" | "gallery" | "appointments" | "team";
@@ -73,7 +73,7 @@ export default function AdminPanel() {
             {activeSection === "faqs" && <AdminFAQs />}
             {activeSection === "gallery" && <AdminGallery />}
             {activeSection === "appointments" && <AdminAppointments />}
-            {activeSection === "team" && <AdminTeam />}
+            {activeSection === "team" && <AdminTeamMembers />}
           </div>
         </div>
       </div>

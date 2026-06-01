@@ -2,16 +2,48 @@ import { useState } from "react";
 import { trpc } from "@/lib/trpc";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Eye } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Eye, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 
 export default function AdminAppointments() {
-  const { data: appointments, isLoading } = trpc.admin.appointments.list.useQuery();
+  const { data: appointments, isLoading, refetch } = trpc.admin.appointments.list.useQuery();
   const [selectedAppointment, setSelectedAppointment] = useState<any>(null);
+  
+  const updateStatusMutation = trpc.admin.appointments.updateStatus.useMutation({
+    onSuccess: () => {
+      toast.success("Status updated successfully");
+      refetch();
+      setSelectedAppointment(null);
+    },
+    onError: (error) => {
+      toast.error("Failed to update status");
+    },
+  });
+
+  const getStatusColor = (status: string | null) => {
+    switch (status) {
+      case "pending":
+        return "bg-yellow-100 text-yellow-800";
+      case "confirmed":
+        return "bg-green-100 text-green-800";
+      case "cancelled":
+        return "bg-red-100 text-red-800";
+      case "completed":
+        return "bg-blue-100 text-blue-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  const handleStatusChange = (appointmentId: number, newStatus: string) => {
+    updateStatusMutation.mutate({ id: appointmentId, status: newStatus as any });
+  };
 
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-gray-900">Appointments</h2>
+        <h2 className="text-2xl font-bold text-gray-900">Appointments Management</h2>
         <p className="text-gray-600">View and manage patient appointments</p>
       </div>
 
@@ -25,7 +57,12 @@ export default function AdminAppointments() {
             <Card key={appointment.id} className="p-4 border-l-4 border-l-green-600">
               <div className="flex items-center justify-between">
                 <div className="flex-1">
-                  <h3 className="font-semibold text-gray-900">{appointment.patientName}</h3>
+                  <div className="flex items-center gap-3 mb-2">
+                    <h3 className="font-semibold text-gray-900">{appointment.patientName}</h3>
+                    <Badge className={getStatusColor(appointment.status || 'pending')}>
+                      {(appointment.status || 'pending').toUpperCase()}
+                    </Badge>
+                  </div>
                   <p className="text-sm text-gray-600">{appointment.patientEmail}</p>
                   <p className="text-sm text-gray-600">{appointment.patientPhone}</p>
                   <p className="text-sm text-gray-700 mt-2">
@@ -89,19 +126,32 @@ export default function AdminAppointments() {
               </div>
               {selectedAppointment.messageEn && (
                 <div>
-                  <p className="text-sm text-gray-600">Message (EN)</p>
+                  <p className="text-sm text-gray-600">Message</p>
                   <p className="font-semibold">{selectedAppointment.messageEn}</p>
                 </div>
               )}
-              {selectedAppointment.notes && (
-                <div>
-                  <p className="text-sm text-gray-600">Notes</p>
-                  <p className="font-semibold">{selectedAppointment.notes}</p>
-                </div>
-              )}
+              <div>
+                <p className="text-sm text-gray-600 mb-2">Status</p>
+                <Badge className={getStatusColor(selectedAppointment.status)}>
+                  {selectedAppointment.status?.toUpperCase()}
+                </Badge>
+              </div>
             </div>
-            <div className="mt-6 flex gap-3">
-              <Button variant="outline" onClick={() => setSelectedAppointment(null)}>
+            <div className="mt-6 space-y-3">
+              <div className="flex gap-2 flex-wrap">
+                {["pending", "confirmed", "cancelled", "completed"].map((status) => (
+                  <Button
+                    key={status}
+                    variant={selectedAppointment.status === status ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => handleStatusChange(selectedAppointment.id, status)}
+                    disabled={updateStatusMutation.isPending}
+                  >
+                    {status.charAt(0).toUpperCase() + status.slice(1)}
+                  </Button>
+                ))}
+              </div>
+              <Button variant="outline" onClick={() => setSelectedAppointment(null)} className="w-full">
                 Close
               </Button>
             </div>

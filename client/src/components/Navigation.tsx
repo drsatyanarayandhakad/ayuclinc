@@ -17,6 +17,7 @@ export default function Navigation() {
     { href: "/services", label: t("nav.services") },
     { href: "/gallery", label: t("nav.gallery") },
     { href: "/blog", label: t("nav.blog") },
+    { href: "/faq", label: "FAQ" },
     { href: "/appointment", label: t("nav.appointment") },
     { href: "/contact", label: t("nav.contact") },
   ];

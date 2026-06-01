@@ -9,7 +9,7 @@ import { X } from "lucide-react";
 
 export default function Gallery() {
   const { t, language } = useLanguage();
-  const { data: galleryImages, isLoading } = trpc.gallery.list.useQuery();
+  const { data: galleryImages, isLoading } = trpc.admin.gallery.list.useQuery();
   const [selectedImage, setSelectedImage] = useState<any>(null);
 
   return (
@@ -62,7 +62,7 @@ export default function Gallery() {
                     </div>
                     <div className="p-4">
                       <p className="text-gray-700 font-semibold">
-                        {language === "en" ? image.titleEn : image.titleHi}
+                        {language === "en" ? image.titleEn || "" : image.titleHi || ""}
                       </p>
                     </div>
                   </Card>
@@ -81,12 +81,12 @@ export default function Gallery() {
                     </button>
                     <img
                       src={selectedImage.imageUrl || "/placeholder-gallery.jpg"}
-                      alt={language === "en" ? selectedImage.titleEn : selectedImage.titleHi}
+                      alt={language === "en" ? (selectedImage.titleEn || "") : (selectedImage.titleHi || "")}
                       className="w-full h-auto rounded-lg"
                     />
                     <div className="mt-4 bg-white p-4 rounded-lg">
                       <p className="text-gray-800 font-semibold">
-                        {language === "en" ? selectedImage.titleEn : selectedImage.titleHi}
+                        {language === "en" ? (selectedImage.titleEn || "") : (selectedImage.titleHi || "")}
                       </p>
                     </div>
                   </div>

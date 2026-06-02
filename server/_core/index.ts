@@ -9,6 +9,7 @@ import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import { generateSitemap } from "../sitemap";
+import { uploadToCloudinary } from "../cloudinary";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -44,6 +45,32 @@ async function startServer() {
     const sitemap = generateSitemap(baseUrl);
     res.type("application/xml");
     res.send(sitemap);
+  });
+  
+  // Cloudinary upload endpoint
+  app.post("/api/upload", async (req, res) => {
+    try {
+      const { file, fileName, folder } = req.body;
+      
+      if (!file || !fileName) {
+        return res.status(400).json({ error: "Missing file or fileName" });
+      }
+      
+      // Convert array to Buffer
+      const buffer = Buffer.from(file);
+      
+      // Upload to Cloudinary
+      const result = await uploadToCloudinary(
+        buffer,
+        fileName,
+        folder || "ayurveda-clinic"
+      );
+      
+      res.json(result);
+    } catch (error) {
+      console.error("Upload error:", error);
+      res.status(500).json({ error: "Upload failed" });
+    }
   });
   
   // tRPC API

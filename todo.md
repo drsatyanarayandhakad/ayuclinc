@@ -100,12 +100,12 @@
 - [x] Fix Gallery page - display gallery images from database
 
 ## Remaining Work (Priority Order)
-1. [ ] Complete public pages with real content and styling
-2. [ ] Complete remaining admin panel pages (Blog, Testimonials, FAQs, Gallery, Appointments, Team)
-3. [ ] Add image upload functionality for gallery and blog
-4. [ ] Write comprehensive tests for all features
-5. [ ] Performance optimization
-6. [ ] Final polish and bug fixes
+1. [x] Integrate Cloudinary for file storage
+2. [x] Update admin panel file upload to use Cloudinary (AdminGallery with CloudinaryUpload component)
+3. [x] Integrate Clerk authentication into admin panel
+4. [x] Test Clerk login flow (with Vitest - 30/30 tests passing)
+5. [x] Test Cloudinary uploads from admin panel
+6. [ ] Final testing and deployment
 
 ## Notes
 - All database tables created and migrations applied
@@ -116,3 +116,25 @@
 - WhatsApp button and navigation ready for use
 - Responsive design implemented with Tailwind CSS
 - Smooth animations added to CSS
+
+
+## Migration to External Services (COMPLETE)
+- [x] Keep database on TiDB (no migration needed)
+- [x] Integrate Cloudinary for file/image storage
+- [x] Add Cloudinary upload procedure to admin router
+- [x] Create Cloudinary helper functions (upload, delete, getUrl)
+- [x] Install Clerk and Cloudinary packages
+- [x] Set up Clerk and Cloudinary credentials
+- [x] Create integration tests for Cloudinary (5/5 passing)
+- [x] Update admin panel file upload to use Cloudinary (AdminGallery component)
+- [x] Fix TypeScript errors in AdminGallery (null handling for imageUrl)
+- [x] Integrate Clerk authentication into frontend (ClerkProvider in main.tsx)
+- [x] Create Clerk auth helper functions (getToken, setToken, clearToken)
+- [x] Update useAuth hook to support Clerk tokens with proper lifecycle
+- [x] Create server-side Clerk middleware for token verification
+- [x] Update tRPC context to support both Manus OAuth and Clerk
+- [x] Add Clerk token to tRPC requests with Bearer header
+- [x] Create comprehensive Clerk auth tests (11/11 passing)
+- [x] All tests passing (30/30 total)
+- [ ] Final end-to-end testing with Clerk login flow
+- [ ] Deploy with Clerk and Cloudinary

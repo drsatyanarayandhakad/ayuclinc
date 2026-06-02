@@ -3,6 +3,7 @@ import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
+import { uploadToCloudinary } from "./cloudinary";
 import {
   getClinicInfo,
   upsertClinicInfo,
@@ -388,6 +389,22 @@ export const appRouter = router({
 
   // ============== ADMIN PANEL ==============
   admin: router({
+    upload: adminProcedure
+      .input(
+        z.object({
+          file: z.instanceof(Buffer),
+          fileName: z.string(),
+          folder: z.string().optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const result = await uploadToCloudinary(
+          input.file,
+          input.fileName,
+          input.folder || "ayurveda-clinic"
+        );
+        return result;
+      }),
     blog: router({
       list: adminProcedure.query(async () => {
         return getBlogPosts();

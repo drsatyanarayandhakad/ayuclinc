@@ -2,7 +2,6 @@ import { getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
 import { TRPCClientError } from "@trpc/client";
 import { useCallback, useEffect, useMemo } from "react";
-import { useAuth as useClerkAuth } from "@clerk/clerk-react";
 import { setClerkToken, clearClerkToken } from "@/lib/clerk-auth";
 
 type UseAuthOptions = {
@@ -15,8 +14,23 @@ export function useAuth(options?: UseAuthOptions) {
     options ?? {};
   const utils = trpc.useUtils();
 
-  // Get Clerk auth state
-  const { isLoaded: clerkLoaded, isSignedIn, getToken } = useClerkAuth();
+  // Try to get Clerk auth state, but handle case where ClerkProvider is not available
+  let clerkLoaded = true;
+  let isSignedIn = false;
+  let getToken: (() => Promise<string | null>) | null = null;
+
+  try {
+    // This will fail if ClerkProvider is not available
+    const clerkAuth = require("@clerk/clerk-react").useAuth?.();
+    if (clerkAuth) {
+      clerkLoaded = clerkAuth.isLoaded ?? true;
+      isSignedIn = clerkAuth.isSignedIn ?? false;
+      getToken = clerkAuth.getToken ?? null;
+    }
+  } catch (error) {
+    // ClerkProvider not available, continue without Clerk
+    console.warn("[Auth] Clerk not available, using Manus OAuth only");
+  }
 
   const meQuery = trpc.auth.me.useQuery(undefined, {
     retry: false,
@@ -33,7 +47,7 @@ export function useAuth(options?: UseAuthOptions) {
   // Update Clerk token when user signs in
   useEffect(() => {
     if (clerkLoaded && isSignedIn && getToken) {
-      getToken({ template: "integration_test" })
+      getToken()
         .then((token) => {
           if (token) {
             setClerkToken(token);
@@ -42,7 +56,7 @@ export function useAuth(options?: UseAuthOptions) {
           }
         })
         .catch((error) => {
-          console.error("[Clerk] Failed to get token:", error);
+          console.warn("[Clerk] Failed to get token:", error);
         });
     }
   }, [clerkLoaded, isSignedIn, getToken]);

@@ -64,16 +64,30 @@ const trpcClient = trpc.createClient({
 
 const clerkPublishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
-if (!clerkPublishableKey) {
-  console.warn("[Clerk] VITE_CLERK_PUBLISHABLE_KEY is not set. Clerk authentication will not work.");
+// Wrapper component to conditionally render ClerkProvider
+function RootApp() {
+  if (!clerkPublishableKey) {
+    // If Clerk key is not set, render without ClerkProvider
+    console.warn("[Clerk] VITE_CLERK_PUBLISHABLE_KEY is not set. Clerk authentication will not work.");
+    return (
+      <trpc.Provider client={trpcClient} queryClient={queryClient}>
+        <QueryClientProvider client={queryClient}>
+          <App />
+        </QueryClientProvider>
+      </trpc.Provider>
+    );
+  }
+
+  // If Clerk key is set, render with ClerkProvider
+  return (
+    <ClerkProvider publishableKey={clerkPublishableKey}>
+      <trpc.Provider client={trpcClient} queryClient={queryClient}>
+        <QueryClientProvider client={queryClient}>
+          <App />
+        </QueryClientProvider>
+      </trpc.Provider>
+    </ClerkProvider>
+  );
 }
 
-createRoot(document.getElementById("root")!).render(
-  <ClerkProvider publishableKey={clerkPublishableKey || ""}>
-    <trpc.Provider client={trpcClient} queryClient={queryClient}>
-      <QueryClientProvider client={queryClient}>
-        <App />
-      </QueryClientProvider>
-    </trpc.Provider>
-  </ClerkProvider>
-);
+createRoot(document.getElementById("root")!).render(<RootApp />);

@@ -20,15 +20,24 @@ export function useAuth(options?: UseAuthOptions) {
   let getToken: (() => Promise<string | null>) | null = null;
 
   try {
-    // This will fail if ClerkProvider is not available
-    const clerkAuth = require("@clerk/clerk-react").useAuth?.();
-    if (clerkAuth) {
-      clerkLoaded = clerkAuth.isLoaded ?? true;
-      isSignedIn = clerkAuth.isSignedIn ?? false;
-      getToken = clerkAuth.getToken ?? null;
+    // Safely try to use Clerk hook
+    // This will fail gracefully if ClerkProvider is not available
+    const useClerkAuth = require("@clerk/clerk-react").useAuth;
+    if (useClerkAuth && typeof useClerkAuth === "function") {
+      try {
+        const clerkAuth = useClerkAuth();
+        if (clerkAuth) {
+          clerkLoaded = clerkAuth.isLoaded ?? true;
+          isSignedIn = clerkAuth.isSignedIn ?? false;
+          getToken = clerkAuth.getToken ?? null;
+        }
+      } catch (hookError) {
+        // useAuth hook failed (likely no ClerkProvider), continue without Clerk
+        console.warn("[Auth] Clerk hook not available, using Manus OAuth only");
+      }
     }
   } catch (error) {
-    // ClerkProvider not available, continue without Clerk
+    // Clerk module not available or other error, continue without Clerk
     console.warn("[Auth] Clerk not available, using Manus OAuth only");
   }
 

@@ -19,6 +19,7 @@ export default function AdminClinicInfo() {
     descriptionEn: "",
     descriptionHi: "",
     phone: "",
+    whatsappNumber: "",
     email: "",
     address: "",
     latitude: "",
@@ -37,6 +38,7 @@ export default function AdminClinicInfo() {
         descriptionEn: clinicInfo.descriptionEn || "",
         descriptionHi: clinicInfo.descriptionHi || "",
         phone: clinicInfo.phone || "",
+        whatsappNumber: (clinicInfo as any).whatsappNumber || "",
         email: clinicInfo.email || "",
         address: clinicInfo.address || "",
         latitude: clinicInfo.latitude?.toString() || "",
@@ -175,6 +177,16 @@ export default function AdminClinicInfo() {
                   value={formData.email}
                   onChange={handleChange}
                   placeholder="info@clinic.com"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">WhatsApp Number</label>
+                <Input
+                  type="tel"
+                  name="whatsappNumber"
+                  value={formData.whatsappNumber}
+                  onChange={handleChange}
+                  placeholder="+91 98765 43210"
                 />
               </div>
               <div>

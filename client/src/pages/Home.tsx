@@ -4,10 +4,13 @@ import WhatsAppButton from "@/components/WhatsAppButton";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
-import { ArrowRight, Leaf } from "lucide-react";
+import { ArrowRight, Leaf, Star } from "lucide-react";
+import { trpc } from "@/lib/trpc";
+import { Card } from "@/components/ui/card";
 
 export default function Home() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const { data: testimonials } = trpc.testimonials.list.useQuery();
 
   return (
     <div className="min-h-screen bg-white">
@@ -58,6 +61,48 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Testimonials Section */}
+      {testimonials && testimonials.length > 0 && (
+        <section className="py-16 md:py-24 bg-gradient-to-br from-green-50 to-emerald-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-12">
+              <h2 className="text-4xl font-bold text-gray-900 mb-4">
+                {language === "en" ? "What Our Patients Say" : "हमारे रोगी क्या कहते हैं"}
+              </h2>
+              <p className="text-lg text-gray-600">
+                {language === "en"
+                  ? "Real stories from people who have experienced our healing services"
+                  : "उन लोगों की वास्तविक कहानियाँ जिन्होंने हमारी उपचार सेवाओं का अनुभव किया है"}
+              </p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {testimonials.slice(0, 3).map((testimonial) => (
+                <Card key={testimonial.id} className="p-6 hover:shadow-lg transition-shadow">
+                  {/* Rating Stars */}
+                  <div className="flex gap-1 mb-4">
+                    {[...Array(testimonial.rating || 5)].map((_, i) => (
+                      <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
+                    ))}
+                  </div>
+
+                  {/* Testimonial Text */}
+                  <p className="text-gray-700 mb-4 leading-relaxed">
+                    "{language === "en" ? testimonial.testimonialEn : testimonial.testimonialHi || testimonial.testimonialEn}"
+                  </p>
+
+                  {/* Patient Name */}
+                  <div className="border-t border-gray-200 pt-4">
+                    <p className="font-semibold text-gray-900">
+                      {language === "en" ? testimonial.patientNameEn : testimonial.patientNameHi || testimonial.patientNameEn}
+                    </p>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* CTA Section */}
       <section className="bg-gradient-to-r from-green-600 to-emerald-600 py-16 md:py-24">

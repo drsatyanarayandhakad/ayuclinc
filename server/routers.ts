@@ -72,6 +72,7 @@ export const appRouter = router({
           descriptionEn: z.string().optional(),
           descriptionHi: z.string().optional(),
           phone: z.string().optional(),
+          whatsappNumber: z.string().optional(),
           email: z.string().optional(),
           address: z.string().optional(),
           latitude: z.string().optional(),

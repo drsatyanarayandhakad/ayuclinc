@@ -8,15 +8,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
-import { MapPin, Phone, Mail, Clock } from "lucide-react";
+import { MapPin, Phone, Mail, Clock, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { trpc } from "@/lib/trpc";
 
 /**
  * Contact page with Google Maps integration and contact form
  */
 export default function Contact() {
   const { t, language } = useLanguage();
+  const { data: clinicData, isLoading } = trpc.clinic.getInfo.useQuery();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -43,17 +45,18 @@ export default function Contact() {
     setFormData({ name: "", email: "", phone: "", subject: "", message: "" });
   };
 
+  // Use database clinic info or fallback to defaults
   const clinicInfo = {
     address: language === "en" 
-      ? "123 Wellness Street, Ayurveda City, State 12345"
-      : "123 वेलनेस स्ट्रीट, आयुर्वेद सिटी, स्टेट 12345",
-    phone: "+91 98765 43210",
-    email: "info@ayurveda-clinic.com",
+      ? (clinicData?.address || "123 Wellness Street, Ayurveda City, State 12345")
+      : (clinicData?.address || "123 वेलनेस स्ट्रीट, आयुर्वेद सिटी, स्टेट 12345"),
+    phone: clinicData?.phone || "+91 98765 43210",
+    email: clinicData?.email || "info@ayurveda-clinic.com",
     hours: language === "en"
-      ? "Monday - Saturday: 9:00 AM - 6:00 PM\nSunday: 10:00 AM - 4:00 PM"
-      : "सोमवार - शनिवार: 9:00 AM - 6:00 PM\nरविवार: 10:00 AM - 4:00 PM",
-    latitude: "28.6139",
-    longitude: "77.2090",
+      ? (clinicData?.openingHoursEn || "Monday - Saturday: 9:00 AM - 6:00 PM\nSunday: 10:00 AM - 4:00 PM")
+      : (clinicData?.openingHoursHi || "सोमवार - शनिवार: 9:00 AM - 6:00 PM\nरविवार: 10:00 AM - 4:00 PM"),
+    latitude: clinicData?.latitude?.toString() || "28.6139",
+    longitude: clinicData?.longitude?.toString() || "77.2090",
   };
 
   return (
@@ -84,61 +87,69 @@ export default function Contact() {
                 {language === "en" ? "Contact Information" : "संपर्क जानकारी"}
               </h2>
 
-              {/* Address */}
-              <Card className="p-6 hover:shadow-lg transition-shadow">
-                <div className="flex gap-4">
-                  <MapPin className="w-6 h-6 text-green-600 flex-shrink-0 mt-1" />
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                      {language === "en" ? "Address" : "पता"}
-                    </h3>
-                    <p className="text-gray-600">{clinicInfo.address}</p>
-                  </div>
+              {isLoading ? (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="w-8 h-8 animate-spin text-green-600" />
                 </div>
-              </Card>
+              ) : (
+                <>
+                  {/* Address */}
+                  <Card className="p-6 hover:shadow-lg transition-shadow">
+                    <div className="flex gap-4">
+                      <MapPin className="w-6 h-6 text-green-600 flex-shrink-0 mt-1" />
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                          {language === "en" ? "Address" : "पता"}
+                        </h3>
+                        <p className="text-gray-600">{clinicInfo.address}</p>
+                      </div>
+                    </div>
+                  </Card>
 
-              {/* Phone */}
-              <Card className="p-6 hover:shadow-lg transition-shadow">
-                <div className="flex gap-4">
-                  <Phone className="w-6 h-6 text-green-600 flex-shrink-0 mt-1" />
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                      {language === "en" ? "Phone" : "फोन"}
-                    </h3>
-                    <a href="tel:+919876543210" className="text-green-600 hover:text-green-700 font-semibold">
-                      {clinicInfo.phone}
-                    </a>
-                  </div>
-                </div>
-              </Card>
+                  {/* Phone */}
+                  <Card className="p-6 hover:shadow-lg transition-shadow">
+                    <div className="flex gap-4">
+                      <Phone className="w-6 h-6 text-green-600 flex-shrink-0 mt-1" />
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                          {language === "en" ? "Phone" : "फोन"}
+                        </h3>
+                        <a href={`tel:${clinicInfo.phone}`} className="text-green-600 hover:text-green-700 font-semibold">
+                          {clinicInfo.phone}
+                        </a>
+                      </div>
+                    </div>
+                  </Card>
 
-              {/* Email */}
-              <Card className="p-6 hover:shadow-lg transition-shadow">
-                <div className="flex gap-4">
-                  <Mail className="w-6 h-6 text-green-600 flex-shrink-0 mt-1" />
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                      {language === "en" ? "Email" : "ईमेल"}
-                    </h3>
-                    <a href="mailto:info@ayurveda-clinic.com" className="text-green-600 hover:text-green-700 font-semibold">
-                      {clinicInfo.email}
-                    </a>
-                  </div>
-                </div>
-              </Card>
+                  {/* Email */}
+                  <Card className="p-6 hover:shadow-lg transition-shadow">
+                    <div className="flex gap-4">
+                      <Mail className="w-6 h-6 text-green-600 flex-shrink-0 mt-1" />
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                          {language === "en" ? "Email" : "ईमेल"}
+                        </h3>
+                        <a href={`mailto:${clinicInfo.email}`} className="text-green-600 hover:text-green-700 font-semibold">
+                          {clinicInfo.email}
+                        </a>
+                      </div>
+                    </div>
+                  </Card>
 
-              {/* Hours */}
-              <Card className="p-6 hover:shadow-lg transition-shadow">
-                <div className="flex gap-4">
-                  <Clock className="w-6 h-6 text-green-600 flex-shrink-0 mt-1" />
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                      {language === "en" ? "Hours" : "घंटे"}
-                    </h3>
-                    <p className="text-gray-600 whitespace-pre-line text-sm">{clinicInfo.hours}</p>
-                  </div>
-                </div>
-              </Card>
+                  {/* Hours */}
+                  <Card className="p-6 hover:shadow-lg transition-shadow">
+                    <div className="flex gap-4">
+                      <Clock className="w-6 h-6 text-green-600 flex-shrink-0 mt-1" />
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                          {language === "en" ? "Hours" : "घंटे"}
+                        </h3>
+                        <p className="text-gray-600 whitespace-pre-line text-sm">{clinicInfo.hours}</p>
+                      </div>
+                    </div>
+                  </Card>
+                </>
+              )}
             </div>
 
             {/* Contact Form */}

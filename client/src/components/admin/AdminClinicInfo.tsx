@@ -10,8 +10,17 @@ import { toast } from "sonner";
 
 export default function AdminClinicInfo() {
   const { t } = useLanguage();
-  const { data: clinicInfo, isLoading } = trpc.clinic.getInfo.useQuery();
-  const updateMutation = trpc.clinic.updateInfo.useMutation();
+  const { data: clinicInfo, isLoading, refetch } = trpc.clinic.getInfo.useQuery();
+  const updateMutation = trpc.clinic.updateInfo.useMutation({
+    onSuccess: () => {
+      toast.success("Clinic information updated successfully!");
+      refetch();
+    },
+    onError: (error: any) => {
+      console.error("Update error:", error);
+      toast.error("Failed to update clinic information: " + (error?.message || "Unknown error"));
+    },
+  });
 
   const [formData, setFormData] = useState({
     nameEn: "",
@@ -62,10 +71,10 @@ export default function AdminClinicInfo() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      console.log("Submitting form data:", formData);
       await updateMutation.mutateAsync(formData);
-      toast.success("Clinic information updated successfully!");
     } catch (error) {
-      toast.error("Failed to update clinic information");
+      console.error("Form submission error:", error);
     }
   };
 
@@ -202,30 +211,32 @@ export default function AdminClinicInfo() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Latitude</label>
                 <Input
-                  type="text"
+                  type="number"
                   name="latitude"
                   value={formData.latitude}
                   onChange={handleChange}
                   placeholder="28.6139"
+                  step="0.0001"
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Longitude</label>
                 <Input
-                  type="text"
+                  type="number"
                   name="longitude"
                   value={formData.longitude}
                   onChange={handleChange}
                   placeholder="77.2090"
+                  step="0.0001"
                 />
               </div>
             </div>
           </div>
 
           {/* Media URLs */}
-          <div>
+          <div className="border-b pb-6">
             <h3 className="text-lg font-bold text-gray-800 mb-4">Media</h3>
-            <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Logo URL</label>
                 <Input
@@ -262,7 +273,7 @@ export default function AdminClinicInfo() {
                   Saving...
                 </>
               ) : (
-                t("admin.save")
+                t("admin.save") || "Save"
               )}
             </Button>
           </div>

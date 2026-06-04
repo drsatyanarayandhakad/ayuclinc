@@ -1,0 +1,1 @@
+ALTER TABLE `clinic_info` ADD `whatsapp_number` varchar(20);

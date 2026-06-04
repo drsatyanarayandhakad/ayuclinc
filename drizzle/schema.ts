@@ -40,6 +40,7 @@ export const clinicInfo = mysqlTable("clinic_info", {
   descriptionEn: text("description_en"),
   descriptionHi: text("description_hi"),
   phone: varchar("phone", { length: 20 }),
+  whatsappNumber: varchar("whatsapp_number", { length: 20 }),
   email: varchar("email", { length: 320 }),
   address: text("address"),
   latitude: decimal("latitude", { precision: 10, scale: 8 }),
